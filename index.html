@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- displays site properly based on user's device -->
+
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="32x32"
+			href="./images/favicon-32x32.png"
+		/>
+
+		<title>Frontend Mentor | Expenses chart component</title>
+
+		<!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
+		<link rel="stylesheet" href="styles.css" />
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+		</style>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	</head>
+	<body>
+		<div class="content_container">
+			<div class="balance">
+				<div class="balance-text">
+					<small>My Balance</small>
+					<h2>$921.48</h2>
+				</div>
+				<div class="balance-icon">
+					<img src="./images/logo.svg" alt="logo" />
+				</div>
+			</div>
+			<div class="chart">
+				<div class="chart__header">
+					<h2>Spending - Last 7 Days</h2>
+				</div>
+				<div class="chart_container">
+					<canvas id="myChart"></canvas>
+				</div>
+
+				<div class="totals">
+					<div class="total">
+						<small>Total this month</small>
+						<h1>478.33</h1>
+					</div>
+					<div class="last_month">
+						<h5>+2.4%</h5>
+						<small>from last month</small>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="attribution">
+			Challenge by
+			<a href="https://www.frontendmentor.io?ref=challenge" target="_blank"
+				>Frontend Mentor</a
+			>. Coded by <a href="#">Beth Innes</a>.
+		</div>
+
+		<script>
+			fetch('./data.json')
+				.then((response) => response.json())
+				.then((chart_data) => {
+					const ctx = document.getElementById('myChart');
+					var labels = chart_data.map(function (e) {
+						return e.day;
+					});
+					var amount = chart_data.map(function (e) {
+						return e.amount;
+					});
+
+					const titleTooltip = (tooltipItem) => {
+						return '';
+					};
+
+					const barColor = chart_data.map(function (e) {
+						if (e.amount > 50) {
+							return 'hsl(186, 34%, 60%)';
+						} else {
+							return 'hsl(10, 79%, 65%)';
+						}
+					});
+
+					const barHoverColor = chart_data.map(function (e) {
+						if (e.amount > 50) {
+							return 'hsl(186, 34%, 60%, 0.5)';
+						} else {
+							return 'hsl(10, 79%, 65%, 0.5)';
+						}
+					});
+
+					var config = {
+						type: 'bar',
+						data: {
+							labels: labels,
+							datasets: [
+								{
+									label: 'Spending Last 7 Days',
+									data: amount,
+
+									backgroundColor: barColor,
+									borderRadius: 5,
+									hoverBackgroundColor: barHoverColor,
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+
+							plugins: {
+								legend: {
+									display: false,
+								},
+								tooltip: {
+									caretSize: 0,
+									yAlign: 'bottom',
+									displayColors: false,
+									mode: 'index',
+									intersect: false,
+									callbacks: {
+										title: titleTooltip,
+										label: (tooltipItem) => {
+											return '$' + tooltipItem.formattedValue;
+										},
+									},
+								},
+							},
+
+							hover: {
+								mode: 'nearest',
+								intersect: false,
+							},
+
+							scales: {
+								x: {
+									grid: {
+										drawOnChartArea: false,
+									},
+								},
+								y: {
+									beginAtZero: true,
+									grid: {
+										drawOnChartArea: false,
+									},
+								},
+							},
+						},
+					};
+
+					new Chart(ctx, config);
+				});
+		</script>
+	</body>
+</html>
